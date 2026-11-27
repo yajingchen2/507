@@ -17,7 +17,7 @@
             <button class="role-card student-card" data-role="snacker">
               <span class="role-emoji">🍪</span>
               <span class="role-name">偷吃者</span>
-              <span class="role-description">从教室后排出发，悄悄观察讲台。</span>
+              <span class="role-description">从后门外的走廊出发，先拿一块饼干。</span>
               <span class="role-action">进入教室 <span aria-hidden="true">→</span></span>
             </button>
             <button class="role-card teacher-card" data-role="supervisor">
@@ -36,11 +36,13 @@
         <div id="game-canvas"></div>
         <div id="hud" class="hud hidden">
           <div class="hud-role"><span class="hud-role-dot"></span><span id="role-label"></span></div>
-          <div class="hud-hint">W A S D <span>移动</span><b>·</b> 鼠标 <span>转向</span><b>·</b> Esc <span>暂停</span></div>
+          <div class="hud-hint">W A S D <span>移动</span><b>·</b> 鼠标 <span>转向</span><b>·</b> E <span>拾取</span><b>·</b> 按住左键 <span>吃</span><b>·</b> Esc <span>暂停</span></div>
           <div id="crosshair" class="crosshair"></div>
-          <div id="snack" class="snack" aria-hidden="true">
+          <div id="action-hint" class="action-hint hidden"></div>
+          <div id="snack" class="snack hidden" aria-hidden="true">
             <div class="snack-cookie"><span></span><span></span><span></span><span></span><span></span></div>
-            <div class="snack-wrapper"></div>
+            <div id="snack-count" class="snack-count">2</div>
+            <div class="snack-hand"></div>
           </div>
         </div>
         <div id="pause-menu" class="modal hidden">

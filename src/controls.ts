@@ -4,6 +4,9 @@ import type { RoleConfig } from './roles';
 export interface ControlCallbacks {
   onPause: () => void;
   onResume: () => void;
+  onLockError: () => void;
+  onInteract: () => void;
+  onPrimaryAction: (pressed: boolean) => void;
 }
 
 export class FirstPersonControls {
@@ -32,6 +35,8 @@ export class FirstPersonControls {
     this.callbacks = callbacks;
     this.camera.rotation.order = 'YXZ';
     this.element.addEventListener('click', this.onClick);
+    document.addEventListener('mousedown', this.onMouseDown);
+    document.addEventListener('mouseup', this.onMouseUp);
     document.addEventListener('pointerlockchange', this.onPointerLockChange);
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('keydown', this.onKeyDown);
@@ -42,6 +47,7 @@ export class FirstPersonControls {
   reset(role: RoleConfig): void {
     this.enabled = true;
     this.keys.clear();
+    this.callbacks.onPrimaryAction(false);
     this.yaw = role.yaw;
     this.pitch = 0;
     this.camera.position.set(...role.position);
@@ -54,6 +60,7 @@ export class FirstPersonControls {
     this.enabled = false;
     this.paused = true;
     this.keys.clear();
+    this.callbacks.onPrimaryAction(false);
     if (document.pointerLockElement === this.element) document.exitPointerLock();
   }
 
@@ -64,16 +71,28 @@ export class FirstPersonControls {
     this.callbacks.onResume();
   }
 
+  requestPointerLock(): void {
+    if (!this.enabled) return;
+    try {
+      void this.element.requestPointerLock().catch(() => this.callbacks.onLockError());
+    } catch {
+      this.callbacks.onLockError();
+    }
+  }
+
   pause(): void {
     if (!this.enabled) return;
     this.paused = true;
     this.keys.clear();
+    this.callbacks.onPrimaryAction(false);
     if (document.pointerLockElement === this.element) document.exitPointerLock();
     this.callbacks.onPause();
   }
 
   dispose(): void {
     this.element.removeEventListener('click', this.onClick);
+    document.removeEventListener('mousedown', this.onMouseDown);
+    document.removeEventListener('mouseup', this.onMouseUp);
     document.removeEventListener('pointerlockchange', this.onPointerLockChange);
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('keydown', this.onKeyDown);
@@ -118,8 +137,8 @@ export class FirstPersonControls {
   }
 
   private onClick = (): void => {
-    if (this.active && document.pointerLockElement !== this.element) {
-      void this.element.requestPointerLock();
+    if (this.enabled && document.pointerLockElement !== this.element) {
+      this.requestPointerLock();
     }
   };
 
@@ -147,6 +166,11 @@ export class FirstPersonControls {
       this.pause();
       return;
     }
+    if (event.code === 'KeyE' && this.active && !this.paused && !event.repeat) {
+      event.preventDefault();
+      this.callbacks.onInteract();
+      return;
+    }
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code) && this.active && !this.paused) {
       event.preventDefault();
       this.keys.add(event.code);
@@ -157,7 +181,16 @@ export class FirstPersonControls {
     this.keys.delete(event.code);
   };
 
+  private onMouseDown = (event: MouseEvent): void => {
+    if (event.button === 0 && this.active && !this.paused) this.callbacks.onPrimaryAction(true);
+  };
+
+  private onMouseUp = (event: MouseEvent): void => {
+    if (event.button === 0) this.callbacks.onPrimaryAction(false);
+  };
+
   private onBlur = (): void => {
     this.keys.clear();
+    this.callbacks.onPrimaryAction(false);
   };
 }

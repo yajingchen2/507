@@ -54,11 +54,15 @@ h1 span { color: #e69b53; }
 .hud-hint span { color: #8d9991; }
 .hud-hint b { margin: 0 8px; color: #c3c6b8; font-weight: 400; }
 .crosshair { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border: 1px solid rgba(255,255,255,.85); border-radius: 50%; background: rgba(61,79,72,.25); transform: translate(-50%, -50%); }
-.snack { position: absolute; right: 7%; bottom: -3%; width: 130px; height: 180px; transform: rotate(-12deg); filter: drop-shadow(0 10px 10px rgba(76,49,32,.24)); }
-.snack-cookie { position: absolute; z-index: 2; top: 8px; left: 19px; display: grid; width: 90px; height: 76px; grid-template-columns: repeat(3, 1fr); place-items: center; border: 5px solid #bf7442; border-radius: 50%; background: #e9b46b; }
+.snack { position: absolute; right: 7%; bottom: 1%; width: 150px; height: 150px; transform: rotate(-13deg); filter: drop-shadow(0 10px 10px rgba(76,49,32,.24)); }
+.snack-cookie { position: absolute; z-index: 2; top: 14px; left: 30px; display: grid; width: 92px; height: 78px; grid-template-columns: repeat(3, 1fr); place-items: center; border: 5px solid #bf7442; border-radius: 50%; background: #e9b46b; }
 .snack-cookie span { width: 7px; height: 7px; border-radius: 50%; background: #70452f; }
 .snack-cookie span:nth-child(2), .snack-cookie span:nth-child(5) { transform: translateY(6px); }
-.snack-wrapper { position: absolute; top: 54px; left: 15px; width: 100px; height: 112px; border: 4px solid #e8bd7c; border-radius: 13px 13px 28px 28px; background: linear-gradient(90deg, #dd8750, #f1b56c 50%, #d57d48); }
+.snack-one-left .snack-cookie { clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%, 50% 0); }
+.snack-count { position: absolute; z-index: 3; top: 2px; right: 4px; display: grid; width: 27px; height: 27px; place-items: center; border: 2px solid #fff9eb; border-radius: 50%; background: #d98a4f; color: white; font-size: 12px; font-weight: 800; }
+.snack-hand { position: absolute; right: 4px; bottom: 3px; width: 83px; height: 64px; border-radius: 48% 42% 18% 24%; background: linear-gradient(145deg, #72b3a5, #498d82); transform: rotate(-22deg); }
+.snack-hand::before { position: absolute; top: -19px; left: -18px; width: 44px; height: 29px; border-radius: 18px 22px 10px 14px; background: #83c4b5; content: ''; transform: rotate(30deg); }
+.action-hint { position: absolute; top: calc(50% + 28px); left: 50%; padding: 9px 14px; border: 1px solid rgba(255,255,255,.72); border-radius: 999px; background: rgba(255,253,247,.88); color: #53675e; font-size: 12px; font-weight: 800; white-space: nowrap; transform: translateX(-50%); }
 .modal { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(44, 58, 54, .38); backdrop-filter: blur(7px); }
 .modal-card { width: min(380px, calc(100% - 36px)); padding: 37px 38px 31px; border: 1px solid rgba(255,255,255,.8); border-radius: 22px; background: #fffdf7; box-shadow: 0 25px 80px rgba(31,47,43,.2); text-align: center; }
 .modal-card h2 { margin: 12px 0 8px; color: #344b45; font-size: 32px; }
@@ -74,5 +78,5 @@ h1 span { color: #e69b53; }
   .menu-card { padding: 30px 0; }
   .hud-hint { top: 76px; right: 16px; left: 16px; text-align: center; }
   .hud-role { top: 18px; left: 16px; }
-  .snack { right: 0; width: 100px; transform: scale(.8) rotate(-12deg); transform-origin: bottom right; }
+  .snack { right: 0; width: 120px; transform: scale(.8) rotate(-12deg); transform-origin: bottom right; }
 }
