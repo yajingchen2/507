@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createClassroom } from './classroom';
+import { createClassroom, type ClassroomSeat } from './classroom';
 import { FirstPersonControls } from './controls';
 import { roles, type RoleId } from './roles';
 import './style.css';
@@ -39,6 +39,7 @@ const classroom = createClassroom(scene);
 const raycaster = new THREE.Raycaster();
 const screenCenter = new THREE.Vector2(0, 0);
 let currentRole: RoleId | undefined;
+let currentSeat: ClassroomSeat | undefined;
 let snackPortions = 0;
 let primaryHeld = false;
 let waitingForRelease = false;
@@ -62,6 +63,16 @@ function canPickUpSnack(): boolean {
   return hit !== undefined && hit.distance <= 3;
 }
 
+function findSeatInView(): ClassroomSeat | undefined {
+  if (currentRole !== 'snacker' || currentSeat) return undefined;
+  camera.updateMatrixWorld(true);
+  const targets = classroom.seats.map((seat) => seat.target);
+  raycaster.setFromCamera(screenCenter, camera);
+  const [hit] = raycaster.intersectObjects(targets, true);
+  if (!hit || hit.distance > 2.8) return undefined;
+  return classroom.seats.find((seat) => seat.target === hit.object);
+}
+
 function isInsideClassroom(): boolean {
   const { x, z } = camera.position;
   return x > -13.6 && x < 13.6 && z > -10.3 && z < 10.2;
@@ -81,6 +92,18 @@ controls = new FirstPersonControls(camera, renderer.domElement, classroom.collid
     startHint.classList.remove('hidden');
   },
   onInteract: () => {
+    if (currentRole !== 'snacker') return;
+    if (currentSeat) {
+      controls.stand(currentSeat.standingPosition);
+      currentSeat = undefined;
+      return;
+    }
+    const seat = findSeatInView();
+    if (seat) {
+      currentSeat = seat;
+      controls.sit(seat.sittingPosition, seat.yaw);
+      return;
+    }
     if (!canPickUpSnack()) return;
     snackPortions = 2;
     classroom.snackPickup.visible = false;
@@ -88,7 +111,6 @@ controls = new FirstPersonControls(camera, renderer.domElement, classroom.collid
   },
   onPrimaryAction: (pressed) => {
     primaryHeld = pressed;
-    biteProgress = 0;
     if (!pressed) waitingForRelease = false;
   },
 });
@@ -96,6 +118,7 @@ controls = new FirstPersonControls(camera, renderer.domElement, classroom.collid
 function enterGame(roleId: RoleId): void {
   const role = roles[roleId];
   currentRole = roleId;
+  currentSeat = undefined;
   snackPortions = 0;
   primaryHeld = false;
   waitingForRelease = false;
@@ -114,6 +137,7 @@ function enterGame(roleId: RoleId): void {
 function returnToMenu(): void {
   controls.disable();
   currentRole = undefined;
+  currentSeat = undefined;
   snackPortions = 0;
   primaryHeld = false;
   waitingForRelease = false;
@@ -148,7 +172,8 @@ document.addEventListener('pointerlockchange', () => {
 function animate(now: number): void {
   requestAnimationFrame(animate);
   controls.update(now);
-  if (currentRole === 'snacker' && snackPortions > 0 && primaryHeld && !waitingForRelease && isInsideClassroom()) {
+  if (currentRole === 'snacker' && currentSeat && snackPortions > 0
+    && primaryHeld && !waitingForRelease && isInsideClassroom()) {
     biteProgress += Math.min((now - previousFrame) / 1000, 0.05);
     if (biteProgress >= 0.7) {
       snackPortions -= 1;
@@ -160,11 +185,20 @@ function animate(now: number): void {
   previousFrame = now;
   actionHint.classList.add('hidden');
   if (pauseMenu.classList.contains('hidden') && currentRole === 'snacker') {
-    if (canPickUpSnack()) {
+    if (currentSeat) {
+      actionHint.textContent = '按 E 起身';
+      actionHint.classList.remove('hidden');
+    } else if (findSeatInView()) {
+      actionHint.textContent = 'E 坐下';
+      actionHint.classList.remove('hidden');
+    } else if (canPickUpSnack()) {
       actionHint.textContent = '按 E 拾取饼干';
       actionHint.classList.remove('hidden');
     } else if (snackPortions > 0 && !isInsideClassroom()) {
-      actionHint.textContent = '进入教室后按住左键吃';
+      actionHint.textContent = '进入教室并坐下后按住左键吃';
+      actionHint.classList.remove('hidden');
+    } else if (snackPortions > 0 && !currentSeat) {
+      actionHint.textContent = '坐下后按住左键吃';
       actionHint.classList.remove('hidden');
     } else if (snackPortions > 0 && waitingForRelease && isInsideClassroom()) {
       actionHint.textContent = '松开并再次按住左键，继续吃';

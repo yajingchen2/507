@@ -21,6 +21,7 @@ export class FirstPersonControls {
   private active = false;
   private enabled = false;
   private paused = true;
+  private sitting = false;
   private lastFrame = 0;
 
   constructor(
@@ -47,6 +48,7 @@ export class FirstPersonControls {
   reset(role: RoleConfig): void {
     this.enabled = true;
     this.keys.clear();
+    this.sitting = false;
     this.callbacks.onPrimaryAction(false);
     this.yaw = role.yaw;
     this.pitch = 0;
@@ -80,6 +82,23 @@ export class FirstPersonControls {
     }
   }
 
+  sit(position: THREE.Vector3Tuple, yaw: number): void {
+    this.sitting = true;
+    this.keys.clear();
+    this.callbacks.onPrimaryAction(false);
+    this.camera.position.set(...position);
+    this.yaw = yaw;
+    this.pitch = 0;
+    this.updateCameraRotation();
+  }
+
+  stand(position: THREE.Vector3Tuple): void {
+    this.sitting = false;
+    this.keys.clear();
+    this.callbacks.onPrimaryAction(false);
+    this.camera.position.set(...position);
+  }
+
   pause(): void {
     if (!this.enabled) return;
     this.paused = true;
@@ -101,7 +120,7 @@ export class FirstPersonControls {
   }
 
   update(now: number): void {
-    if (!this.active || this.paused) return;
+    if (!this.active || this.paused || this.sitting) return;
     const delta = Math.min((now - (this.lastFrame || now)) / 1000, 0.05);
     this.lastFrame = now;
     const forward = Number(this.keys.has('KeyW')) - Number(this.keys.has('KeyS'));
