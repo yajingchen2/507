@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5eee0" />
+    <title>偷吃行动 · 教室原型</title>
+  </head>
+  <body>
+    <div id="app">
+      <main id="menu" class="screen">
+        <div class="menu-card">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> CLASSROOM PROTOTYPE · V0.1</div>
+          <h1>偷吃<span>行动</span></h1>
+          <p class="intro">上课铃已经响了。今天，你想站在哪一边？</p>
+          <div class="role-options">
+            <button class="role-card student-card" data-role="snacker">
+              <span class="role-emoji">🍪</span>
+              <span class="role-name">偷吃者</span>
+              <span class="role-description">从教室后排出发，悄悄观察讲台。</span>
+              <span class="role-action">进入教室 <span aria-hidden="true">→</span></span>
+            </button>
+            <button class="role-card teacher-card" data-role="supervisor">
+              <span class="role-emoji">📚</span>
+              <span class="role-name">监管者</span>
+              <span class="role-description">从讲台出发，看看今天谁在开小差。</span>
+              <span class="role-action">进入教室 <span aria-hidden="true">→</span></span>
+            </button>
+          </div>
+          <div class="menu-footer"><span>WASD 移动</span><i></i><span>鼠标转向</span><i></i><span>Esc 暂停</span></div>
+        </div>
+        <div class="menu-decoration decoration-left">✳</div>
+        <div class="menu-decoration decoration-right">✦</div>
+      </main>
+      <section id="game" class="screen hidden" aria-label="第一人称教室">
+        <div id="game-canvas"></div>
+        <div id="hud" class="hud hidden">
+          <div class="hud-role"><span class="hud-role-dot"></span><span id="role-label"></span></div>
+          <div class="hud-hint">W A S D <span>移动</span><b>·</b> 鼠标 <span>转向</span><b>·</b> Esc <span>暂停</span></div>
+          <div id="crosshair" class="crosshair"></div>
+          <div id="snack" class="snack" aria-hidden="true">
+            <div class="snack-cookie"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="snack-wrapper"></div>
+          </div>
+        </div>
+        <div id="pause-menu" class="modal hidden">
+          <div class="modal-card">
+            <div class="eyebrow">TAKE A BREATHER</div>
+            <h2>暂停一下</h2>
+            <p>教室还在这里，准备好就继续吧。</p>
+            <button id="resume-button" class="primary-button">继续游戏 <span>→</span></button>
+            <button id="menu-button" class="text-button">返回身份选择</button>
+          </div>
+        </div>
+        <div id="start-hint" class="start-hint hidden">点击画面继续 · Esc 暂停</div>
+      </section>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
